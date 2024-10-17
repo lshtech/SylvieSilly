@@ -1,7 +1,7 @@
 --- STEAMODDED HEADER
 --- MOD_NAME: Sylvie's Silliness
 --- MOD_ID: SylvieSilly
---- MOD_AUTHOR: [NewtTheFish]
+--- MOD_AUTHOR: [NewtTheFish, elbe]
 --- MOD_DESCRIPTION: A few decks, blinds, etc. Have fun!
 --- DISPLAY_NAME: Sylvie Sillies
 --- BADGE_COLOUR: C7387D
@@ -822,11 +822,10 @@ function Game:start_run(args)
 	local ret = Game_start_run_ref(self, args)
 
     -- RESET
-    G.P_CENTER_POOLS.Enhanced[1].config.bonus = 30
-    G.P_CENTER_POOLS.Enhanced[2].config.mult = 4
-
-    G.P_CENTER_POOLS.Enhanced[6].config.bonus = 50
-    G.P_CENTER_POOLS.Enhanced[7].config.h_dollars = 3
+    G.P_CENTERS["m_bonus"].config.bonus = 30
+    G.P_CENTERS["m_mult"].config.mult = 4
+    G.P_CENTERS["m_stone"].config.bonus = 50
+    G.P_CENTERS["m_gold"].config.h_dollars = 3
 
 	return ret
 end
