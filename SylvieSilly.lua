@@ -10,107 +10,847 @@
 ----------------------------------------------
 ------------MOD CODE -------------------------
 
--- BOOSTER API
-
-SMODS.Boosters = {}
-SMODS.Booster = {
-  	name = "",
-  	slug = "",
-	cost = 4,
-	config = {},
-  	pos = {},
-	discovered = false,
-    weight = 1, 
-    kind = 'Standard',
-    atlas = 'Booster'
+SMODS.Atlas {
+	key = "sylvie_backs",
+	path = "sylvie_backs.png",
+	px = 71,
+	py = 95,
+    atlas_table = 'ASSET_ATLAS',
+}
+SMODS.Atlas {
+	key = "sylvie_moons",
+	path = "sylvie_moons.png",
+	px = 71,
+	py = 95,
+    atlas_table = 'ASSET_ATLAS',
+}
+SMODS.Atlas {
+	key = "sylvie_vouchers",
+	path = "sylvie_vouchers.png",
+	px = 71,
+	py = 95,
+    atlas_table = 'ASSET_ATLAS',
+}
+SMODS.Atlas {
+	key = "sylvie_blinds",
+	path = "sylvie_blinds.png",
+    atlas_table = "ANIMATION_ATLAS",
+	px = 34,
+	py = 34,
+    frames = 21
+}
+SMODS.Atlas {
+	key = "sylvie_spectrals",
+	path = "sylvie_spectrals.png",
+	px = 71,
+	py = 95,
+    atlas_table = 'ASSET_ATLAS',
+}
+SMODS.Atlas {
+	key = "sylvie_boosters",
+	path = "sylvie_boosters.png",
+	px = 71,
+	py = 95,
+    atlas_table = 'ASSET_ATLAS',
 }
 
-function SMODS.Booster:new(name, slug, config, pos, cost, discovered, weight, kind, atlas)
-    o = {}
-    setmetatable(o, self)
-    self.__index = self
+SMODS.Blind {
+    loc_txt = {
+        name = 'The Prospector',
+        text = {'All Stone, Steel, Gold, and', 'Glass cards are debuffed'}
+    },
+    key = 'prospector',
+    name = 'The Prospector',
+    config = {},
+    boss = {min = 2, max = 10},
+    boss_colour = HEX("e57f8d"),
+    atlas = "sylvie_blinds",
+    pos = {x = 0, y = 0},
+    vars = {},
+    dollars = 5,
+    mult = 2,
+    discovered = false,
+    debuff_card = function(self, card, from_blind)
+        if card.ability.name == 'Stone Card' or card.ability.name == 'Gold Card' or card.ability.name == 'Steel Card' or card.ability.name == 'Glass Card' then
+            card:set_debuff(true)
+        end
+    end
+}
+SMODS.Blind {
+    loc_txt = {
+        name = 'The Gambler',
+        text = {'All Wild, Lucky, Mult, and', 'Bonus cards are debuffed'}
+    },
+    key = 'gambler',
+    name = 'The Gambler',
+    config = {},
+    boss = {min = 2, max = 10},
+    boss_colour = HEX("62679a"),
+    atlas = "sylvie_blinds",
+    pos = {x = 0, y = 1},
+    vars = {},
+    dollars = 5,
+    mult = 2,
+    discovered = false,
+    debuff_card = function(self, card, from_blind)
+        if card.ability.name == 'Mult' or card.ability.name == 'Bonus' or card.ability.name == 'Wild Card' or card.ability.name == 'Lucky Card' then
+            card:set_debuff(true)
+        end
+    end
+}
+SMODS.Blind {
+    loc_txt = {
+        name = 'The Pathway',
+        text = {'All 6, 7, 8, 9, and', '10 cards are debuffed'}
+    },
+    key = 'pathway',
+    name = 'The Pathway',
+    config = {},
+    boss = {min = 1, max = 10},
+    boss_colour = HEX("9a8a43"),
+    atlas = "sylvie_blinds",
+    pos = {x = 0, y = 2},
+    vars = {},
+    dollars = 5,
+    mult = 2,
+    discovered = false,
+    debuff_card = function(self, card, from_blind)
+        if card:get_id() == 6 or card:get_id() == 7 or card:get_id() == 8 or card:get_id() == 9 or card:get_id() == 10 then
+            card:set_debuff(true)
+        end
+    end
+}
+SMODS.Blind {
+    loc_txt = {
+        name = 'The Backside',
+        text = {'All Ace, 2, 3, 4, and', '5 cards are debuffed'}
+    },
+    key = 'backside',
+    name = 'The Backside',
+    config = {},
+    boss = {min = 1, max = 10},
+    boss_colour = HEX("88619a"),
+    atlas = "sylvie_blinds",
+    pos = {x = 0, y = 3},
+    vars = {},
+    dollars = 5,
+    mult = 2,
+    discovered = false,
+    debuff_card = function(self, card, from_blind)
+        if card:get_id() == 14 or card:get_id() == 2 or card:get_id() == 3 or card:get_id() == 4 or card:get_id() == 5 then
+            card:set_debuff(true)
+        end
+    end
+}
+SMODS.Blind {
+    loc_txt = {
+        name = 'The Heatwave',
+        text = {'All even cards are', 'drawn face down'}
+    },
+    key = 'heatwave',
+    name = 'The Heatwave',
+    config = {},
+    boss = {min = 2, max = 10},
+    boss_colour = HEX("b72041"),
+    atlas = "sylvie_blinds",
+    pos = {x = 0, y = 4},
+    vars = {},
+    dollars = 5,
+    mult = 2,
+    discovered = false,
+    stay_flipped = function(Self, area, card)
+        if card:get_id() == 2 or card:get_id() == 4 or card:get_id() == 6 or card:get_id() == 8 or card:get_id() == 10 then
+            return true
+        end
+    end,
+    disable = function(self)
+        for i = 1, #G.hand.cards do
+            if G.hand.cards[i].facing == 'back' then
+                G.hand.cards[i]:flip()
+            end
+        end
+        for k, v in pairs(G.playing_cards) do
+            v.ability.wheel_flipped = nil
+        end
+    end
+}
+SMODS.Blind {
+    loc_txt = {
+        name = 'The Frost',
+        text = {'All odd cards are', 'drawn face down'}
+    },
+    key = 'frost',
+    name = 'The Frost',
+    config = {},
+    boss = {min = 2, max = 10},
+    boss_colour = HEX("5090b7"),
+    atlas = "sylvie_blinds",
+    pos = {x = 0, y = 5},
+    vars = {},
+    dollars = 5,
+    mult = 2,
+    discovered = false,
+    stay_flipped = function(self, area, card)
+        if card:get_id() == 14 or card:get_id() == 3 or card:get_id() == 5 or card:get_id() == 7 or card:get_id() == 9 then
+            return true
+        end
+    end,
+    disable = function(self)
+        for i = 1, #G.hand.cards do
+            if G.hand.cards[i].facing == 'back' then
+                G.hand.cards[i]:flip()
+            end
+        end
+        for k, v in pairs(G.playing_cards) do
+            v.ability.wheel_flipped = nil
+        end
+    end
+}
 
-    o.name = name
-    o.slug = "p_" .. slug
-    o.config = config or {}
-    o.pos = pos or {
+SMODS.Back {
+    key = 'ss_lemonlime',
+    loc_txt = {
+        name = "Lemon-Lime Deck",
+        text = {
+            "Divides up the deck!",
+            "{C:red}-1{} discard.",
+            "The {C:attention}2's{} are extra tasty.",
+        }
+    },
+    name = "Lemon-Lime Deck",
+    pos = { x = 0, y = 5 },
+    atlas = 'sylvie_backs',
+    config = { discards = -1 },
+    apply = function(self)
+        delay(0.4)
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                local seal_counter = 1
+                for k, v in pairs(G.playing_cards) do
+                    if v.base.value == 'Ace' or v.base.value == '10' or v.base.value == '6' then
+                        v:change_suit('Spades')
+                    elseif v.base.value == 'King' or v.base.value == '9' or v.base.value == '5'  then
+                        v:change_suit('Hearts')
+                    elseif v.base.value == 'Queen' or v.base.value == '8' or v.base.value == '4'  then
+                        v:change_suit('Clubs')
+                    elseif v.base.value == 'Jack' or v.base.value == '7' or v.base.value == '3'  then
+                        v:change_suit('Diamonds')
+                    elseif v.base.value == '2' then
+                        v:set_ability(G.P_CENTERS['m_wild'])
+                        if seal_counter == 1 then v:set_seal('Red', true, true)
+                        elseif seal_counter == 2 then v:set_seal('Blue', true, true)
+                        elseif seal_counter == 3 then v:set_seal('Gold', true, true)
+                        else v:set_seal('Purple', true, true)
+                        end
+                        seal_counter = seal_counter + 1
+                    end
+                end
+            return true
+            end
+        }))
+    end
+}
+SMODS.Back {
+    key = 'ss_aurora',
+    loc_txt = {
+        name = "Aurora Deck",
+        text = {
+            "Start with an {C:spectral,T:c_aura}Aura{} card.",
+            "{C:attention}Jokers{} and {C:attention}Playing Cards{}",
+            "are {C:attention}usually{} {C:dark_edition}Special.",
+            "{C:red}-1{} joker slot, {C:red}-1{} hand."
+        }
+    },
+    name = "Aurora Deck",
+    pos = { x = 2, y = 5 },
+    atlas = 'sylvie_backs',
+    config = { vouchers = {'v_hone', 'v_glow_up'}, consumables = {'c_aura'}, joker_slot = -1, hands = -1 },
+    apply = function(self)
+        G.GAME.starting_params.auroramodifier = true
+    end
+}
+SMODS.Back {
+    key = 'ss_sulfur',
+    loc_txt = {
+        name = "Sulfur Deck",
+        text = {
+            "Start with a {C:tarot,T:c_death}Death{} card",
+            "and the {C:attention,T:v_overstock_norm}Overstock{} voucher.",
+            "{C:attention}Jokers{} appear less often.",
+        }
+    },
+    name = "Sulfur Deck",
+    pos = { x = 3, y = 5 },
+    atlas = 'sylvie_backs',
+    config = { consumables = {'c_death'}, joker_rate = 4, voucher = 'v_overstock_norm' },
+    apply = function(self)
+    end
+}
+SMODS.Back {
+    key = 'ss_hallowed',
+    loc_txt = {
+        name = "Hallowed Deck",
+        text = {
+            "{C:planet}Planets{} and {C:purple}Tarots{}",
+            "no longer appear, while",
+            "{C:attention}Playing Cards{} now",
+            "appear in the shop."
+        }
+    },
+    name = "Hallowed Deck",
+    pos = { x = 3, y = 5 },
+    atlas = 'sylvie_backs',
+    config = { voucher = 'v_magic_trick' },
+    apply = function(self)
+        G.GAME.tarot_rate = 0
+        G.GAME.planet_rate = 0
+        G.GAME.playing_card_rate = 10
+    end
+}
+SMODS.Back {
+    key = 'ss_deckos',
+    loc_txt = {
+        name = "Deck OS",
+        text = {
+            "BOOTING...",
+            "{C:red}FAILED{} TO LOAD...",
+            "{C:spectral}ATTEMPTING{} TO FIX...",
+        }
+    },
+    name = "Deck OS",
+    pos = { x = 4, y = 5 },
+    atlas = 'sylvie_backs',
+    config = { },
+    apply = function(self)
+        G.E_MANAGER:add_event(Event({
+            func = function()
+                for k, v in pairs(G.playing_cards) do
+                    if v.base.suit == 'Clubs' then
+                        v:set_ability(G.P_CENTERS['m_busted'])
+                    end
+                end
+            return true
+            end
+        }))
+    end
+}
+
+SMODS.Voucher {
+    key = 'stamper',
+    loc_txt = {
+        name = 'Stamper',
+        text = {
+            'Increase chance to find',
+            '{C:attention}Playing cards{} with {C:attention}Seals',
+            'in {C:attention}Standard Packs',
+        }
+    },
+    pos = {
         x = 0,
         y = 0
-    }
-    o.cost = cost
-    o.discovered = discovered or false
-    o.weight = weight or 1
-	o.kind = kind or 'Standard'
-	o.atlas = atlas or 'Booster'
-	return o
+    },
+    cost = 10,
+    discovered = false,
+    redeem = function(self)
+    end,
+    atlas = "sylvie_vouchers"
+}
+SMODS.Voucher {
+    key = 'seal_deal',
+    loc_txt = {
+        name = 'Seal the Deal',
+        text = {
+            '{C:attention}Playing cards{} from',
+            '{C:attention}Standard Packs{} always',
+            'have {C:attention}Seals',
+        }
+    },
+    pos = {
+        x = 1,
+        y = 0
+    },
+    cost = 10,
+    discovered = false,
+    redeem = function(self)
+    end,
+    atlas = "sylvie_vouchers",
+    requires={MOD_PREFIX_V..'stamper'}
+}
+
+SMODS.Consumable {
+    key = 'bloom',
+    set = 'Spectral',
+	loc_txt = {
+		name = 'Bloom',
+		text = {
+			'Create a {C:money}Speed{},',
+            '{C:money}Investment{}, or',
+            '{C:money}Economy Tag'
+		}
+	},
+    pos = {
+        x = 0,
+        y = 0,
+    },
+	cost = 4,
+    atlas = 'sylvie_spectrals',
+    unlocked = true,
+    discovered = false,
+    can_use = function(self, card)
+        return true
+    end,
+    use = function(self, card, area, copier)
+        G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()
+            local bloom_tag_name = pseudorandom_element({'tag_economy', 'tag_skip', 'tag_investment'})
+            local bloom_tag = Tag(bloom_tag_name, nil, G.GAME.blind)
+            add_tag(bloom_tag)
+            return true end }))
+    end
+}
+
+SMODS.Consumable {
+    key = "sylvie_europa",
+    loc_txt = {
+        name = 'Europa',
+        text = {
+            "{C:attention}Upgrade{} all",
+            "{C:spades}Spade{} cards",
+            "in your deck",
+            "by {C:chips}+#1#{} Chips"
+        },
+    },
+    set = 'Planet',
+    atlas = "sylvie_moons",
+    config = { chips = 5 },
+    set_card_type_badge = badge_jovianmoon,
+    pos = { x = 0, y = 0 },
+    cost = 3,
+    unlocked = true,
+    discovered = false,
+    can_use = function(self, card)
+        return true
+    end,
+    loc_vars = function(self, info_queue, card)
+        return {vars = {self.config.chips }}
+    end,
+    use = function(self, card, area, copier)
+        local used_tarot = copier or card
+        for _, v in pairs(G.playing_cards) do
+            if v:is_suit('Spades') then
+                v.ability.perma_bonus = v.ability.perma_bonus or 0
+                v.ability.perma_bonus = v.ability.perma_bonus + card.ability.chips
+            end
+        end
+        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('timpani')
+            used_tarot:juice_up(0.3, 0.5)
+            attention_text({
+                text = 'Spades Up!',
+                scale = 1, 
+                hold = 1.2,
+                major = used_tarot,
+                backdrop_colour = G.C.SO_1.Spades,
+                align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
+                offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
+                silent = true
+            })
+            return true end }))
+        delay(2.6)
+    end,
+}
+SMODS.Consumable {
+    key = "sylvie_io",
+    loc_txt = {
+        name = 'Io',
+        text = {
+            "{C:attention}Upgrade{} all",
+            "{C:clubs}Club{} cards",
+            "in your deck",
+            "by {C:chips}+#1#{} Chips"
+        },
+    },
+    set = 'Planet',
+    atlas = "sylvie_moons",
+    config = { chips = 5 },
+    set_card_type_badge = badge_jovianmoon,
+    pos = { x = 1, y = 0 },
+    cost = 3,
+    unlocked = true,
+    discovered = false,
+    can_use = function(self, card)
+        return true
+    end,
+    loc_vars = function(self, info_queue, card)
+        return {vars = { self.config.chips }}
+    end,
+    use = function(self, card, area, copier)
+        local used_tarot = copier or card
+        for _, v in pairs(G.playing_cards) do
+            if v:is_suit('Clubs') then
+                v.ability.perma_bonus = v.ability.perma_bonus or 0
+                v.ability.perma_bonus = v.ability.perma_bonus + card.ability.chips
+            end
+        end
+        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('timpani')
+            used_tarot:juice_up(0.3, 0.5)
+            attention_text({
+                text = 'Clubs Up!',
+                scale = 1, 
+                hold = 1.2,
+                major = used_tarot,
+                backdrop_colour = G.C.SO_1.Spades,
+                align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
+                offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
+                silent = true
+            })
+            return true end }))
+        delay(2.6)
+    end,
+}
+SMODS.Consumable {
+    key = "sylvie_callisto",
+    loc_txt = {
+        name = 'Callisto',
+        text = {
+            "{C:attention}Upgrade{} all",
+            "{C:hearts}Heart{} cards",
+            "in your deck",
+            "by {C:chips}+#1#{} Chips"
+        },
+    },
+    set = 'Planet',
+    atlas = "sylvie_moons",
+    config = { chips = 5 },
+    set_card_type_badge = badge_jovianmoon,
+    pos = { x = 2, y = 0 },
+    cost = 3,
+    unlocked = true,
+    discovered = false,
+    can_use = function(self, card)
+        return true
+    end,
+    loc_vars = function(self, info_queue, card)
+        return {vars = { self.config.chips }}
+    end,
+    use = function(self, card, area, copier)
+        local used_tarot = copier or card
+        for _, v in pairs(G.playing_cards) do
+            if v:is_suit('Hearts') then
+                v.ability.perma_bonus = v.ability.perma_bonus or 0
+                v.ability.perma_bonus = v.ability.perma_bonus + card.ability.chips
+            end
+        end
+        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('timpani')
+            used_tarot:juice_up(0.3, 0.5)
+            attention_text({
+                text = 'Hearts Up!',
+                scale = 1, 
+                hold = 1.2,
+                major = used_tarot,
+                backdrop_colour = G.C.SO_1.Spades,
+                align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
+                offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
+                silent = true
+            })
+            return true end }))
+        delay(2.6)
+    end,
+}
+SMODS.Consumable {
+    key = "sylvie_ganymede",
+    loc_txt = {
+        name = 'Ganymede',
+        text = {
+            "{C:attention}Upgrade{} all",
+            "{C:diamonds}Diamond{} cards",
+            "in your deck",
+            "by {C:chips}+#1#{} Chips"
+        },
+    },
+    set = 'Planet',
+    atlas = "sylvie_moons",
+    config = { chips = 5 },
+    set_card_type_badge = badge_jovianmoon,
+    pos = { x = 3, y = 0 },
+    cost = 3,
+    unlocked = true,
+    discovered = false,
+    can_use = function(self, card)
+        return true
+    end,
+    loc_vars = function(self, info_queue, card)
+        return {vars = { self.config.chips }}
+    end,
+    use = function(self, card, area, copier)
+        local used_tarot = copier or card
+        for _, v in pairs(G.playing_cards) do
+            if v:is_suit('Diamonds') then
+                v.ability.perma_bonus = v.ability.perma_bonus or 0
+                v.ability.perma_bonus = v.ability.perma_bonus + card.ability.chips
+            end
+        end
+        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('timpani')
+            used_tarot:juice_up(0.3, 0.5)
+            attention_text({
+                text = 'Diamonds Up!',
+                scale = 1, 
+                hold = 1.2,
+                major = used_tarot,
+                backdrop_colour = G.C.SO_1.Spades,
+                align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
+                offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
+                silent = true
+            })
+            return true end }))
+        delay(2.6)
+    end,
+}
+SMODS.Consumable {
+    key = "sylvie_charon",
+    loc_txt = {
+        name = 'Charon',
+        text = {
+            "{C:attention}Upgrade{} {C:chips}Bonus Cards{}",
+            "by {C:chips}+#1#{} chips",
+            "Affects {C:chips}Current{}",
+            "and {C:dark_edition}Future{} cards",
+        },
+    },
+    set = 'Planet',
+    atlas = "sylvie_moons",
+    config = { chips = 10 },
+    set_card_type_badge = badge_jovianmoon,
+    pos = { x = 0, y = 1 },
+    cost = 3,
+    unlocked = true,
+    discovered = false,
+    can_use = function(self, card)
+        return true
+    end,
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.m_bonus
+        return {vars = { self.config.chips }}
+    end,
+    use = function(self, card, area, copier)
+        local used_tarot = copier or card
+        G.P_CENTER_POOLS.Enhanced[1].config.bonus = G.P_CENTER_POOLS.Enhanced[1].config.bonus + card.ability.chips
+        for _, v in pairs(G.playing_cards) do
+            if v.config.center == G.P_CENTERS.m_bonus then
+                v:set_ability(G.P_CENTERS.m_bonus)
+            end
+        end
+
+        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('timpani')
+            used_tarot:juice_up(0.3, 0.5)
+            attention_text({
+                text = 'Bonus Up!',
+                scale = 1, 
+                hold = 1.2,
+                major = used_tarot,
+                backdrop_colour = G.C.CHIPS,
+                align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
+                offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
+                silent = true
+            })
+            return true end }))
+        delay(2.6)
+    end,
+}
+SMODS.Consumable {
+    key = "sylvie_hydra",
+    loc_txt = {
+        name = 'Hydra',
+        text = {
+            "{C:attention}Upgrade{} {C:mult}Mult Cards{}",
+            "by {C:mult}+#1#{} mult",
+            "Affects {C:mult}Current{}",
+            "and {C:dark_edition}Future{} cards",
+        },
+    },
+    set = 'Planet',
+    atlas = "sylvie_moons",
+    config = { mult = 2 },
+    set_card_type_badge = badge_jovianmoon,
+    pos = { x = 1, y = 1 },
+    cost = 3,
+    unlocked = true,
+    discovered = false,
+    can_use = function(self, card)
+        return true
+    end,
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.m_mult
+        return {vars = { self.config.mult }}
+    end,
+    use = function(self, card, area, copier)
+        local used_tarot = copier or card
+        G.P_CENTER_POOLS.Enhanced[2].config.mult = G.P_CENTER_POOLS.Enhanced[2].config.mult + card.ability.mult
+        for k, v in pairs(G.playing_cards) do
+            if v.config.center == G.P_CENTERS.m_mult then
+                v:set_ability(G.P_CENTERS.m_mult)
+            end
+        end
+
+        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('timpani')
+            used_tarot:juice_up(0.3, 0.5)
+            attention_text({
+                text = 'Mult Up!',
+                scale = 1, 
+                hold = 1.2,
+                major = used_tarot,
+                backdrop_colour = G.C.MULT,
+                align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
+                offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
+                silent = true
+            })
+            return true end }))
+        delay(2.6)
+    end,
+}
+SMODS.Consumable {
+    key = "sylvie_titan",
+    loc_txt = {
+        name = 'Titan',
+        text = {
+            "{C:attention}Upgrade{} {C:chips}Stone Cards{}",
+            "by {C:chips}+#1#{} chips",
+            "Affects {C:chips}Current{}",
+            "and {C:dark_edition}Future{} cards",
+        },
+    },
+    set = 'Planet',
+    atlas = "sylvie_moons",
+    config = { chips = 10 },
+    set_card_type_badge = badge_jovianmoon,
+    pos = { x = 0, y = 2 },
+    cost = 3,
+    unlocked = true,
+    discovered = false,
+    can_use = function(self, card)
+        return true
+    end,
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.m_stone
+        return {vars = { self.config.chips }}
+    end,
+    use = function(self, card, area, copier)
+        local used_tarot = copier or card
+        G.P_CENTER_POOLS.Enhanced[6].config.bonus = G.P_CENTER_POOLS.Enhanced[6].config.bonus + card.ability.chips
+        for _, v in pairs(G.playing_cards) do
+            if v.config.center == G.P_CENTERS.m_stone then
+                v:set_ability(G.P_CENTERS.m_stone)
+            end
+        end
+
+        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('timpani')
+            used_tarot:juice_up(0.3, 0.5)
+            attention_text({
+                text = 'Stone Up!',
+                scale = 1, 
+                hold = 1.2,
+                major = used_tarot,
+                backdrop_colour = G.C.CHIPS,
+                align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
+                offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
+                silent = true
+            })
+            return true end }))
+        delay(2.6)
+    end,
+}
+SMODS.Consumable {
+    key = "sylvie_euceladus",
+    loc_txt = {
+        name = 'Euceladus',
+        text = {
+            "{C:attention}Upgrade{} {C:money}Gold Cards{}",
+            "by {C:money}+1{} dollars",
+            "Affects {C:money}Current{}",
+            "and {C:dark_edition}Future{} cards",
+        },
+    },
+    set = 'Planet',
+    atlas = "sylvie_moons",
+    config = { gold = 1 },
+    set_card_type_badge = badge_jovianmoon,
+    pos = { x = 1, y = 2 },
+    cost = 3,
+    unlocked = true,
+    discovered = false,
+    can_use = function(self, card)
+        return true
+    end,
+    loc_vars = function(self, info_queue, card)
+        info_queue[#info_queue+1] = G.P_CENTERS.m_gold
+        return {vars = { self.config.gold }}
+    end,
+    use = function(self, card, area, copier)
+        local used_tarot = copier or card
+        G.P_CENTER_POOLS.Enhanced[7].config.h_dollars = G.P_CENTER_POOLS.Enhanced[7].config.h_dollars + card.ability.gold
+        for _, v in pairs(G.playing_cards) do
+            if v.config.center == G.P_CENTERS.m_gold then
+                v:set_ability(G.P_CENTERS.m_gold)
+            end
+        end
+
+        G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
+            play_sound('timpani')
+            used_tarot:juice_up(0.3, 0.5)
+            attention_text({
+                text = 'Gold Up!',
+                scale = 1, 
+                hold = 1.2,
+                major = used_tarot,
+                backdrop_colour = G.C.MONEY,
+                align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
+                offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
+                silent = true
+            })
+            return true end }))
+        delay(2.6)
+    end,
+}
+
+local Game_start_run_ref = Game.start_run;
+function Game:start_run(args)
+	local ret = Game_start_run_ref(self, args)
+
+    -- RESET
+    G.P_CENTER_POOLS.Enhanced[1].config.bonus = 30
+    G.P_CENTER_POOLS.Enhanced[2].config.mult = 4
+
+    G.P_CENTER_POOLS.Enhanced[6].config.bonus = 50
+    G.P_CENTER_POOLS.Enhanced[7].config.h_dollars = 3
+
+	return ret
 end
 
-function SMODS.Booster:register()
-	SMODS.Boosters[self.slug] = self
+local create_card_def = create_card
+function create_card (_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
+    local card = create_card_def(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
 
-	local minId = table_length(G.P_CENTER_POOLS['Booster']) + 1
-    local id = 0
-    local i = 0
-	i = i + 1
-	-- Prepare some Datas
-	id = i + minId
+    if G.STATE == G.STATES.STANDARD_PACK and (card.ability.set == 'Default' or card.ability.set == 'Enhanced') and card.seal == nil then
+        if G.GAME.used_vouchers.v_stamper and not G.GAME.used_vouchers.v_seal_deal then
+            if pseudorandom('stamper_odds') > 0.25 then
+                local seal_type = SMODS.poll_seal({guaranteed = true, key = 'stamper'})
+                card:set_seal(seal_type)
+            end
+        elseif G.GAME.used_vouchers.v_seal_deal then
+            local seal_type = SMODS.poll_seal({guaranteed = true, key = 'seal_deal'})
+            card:set_seal(seal_type)
+        end
+    end
 
-	local booster_obj = {
-		discovered = self.discovered,
-		name = self.name,
-		set = "Booster",
-		order = id,
-		key = self.slug,
-		pos = self.pos,
-        cost = self.cost,
-		config = self.config,
-		weight = self.weight,
-		kind = self.kind,
-		atlas = self.atlas
-	}
-
-	for _i, sprite in ipairs(SMODS.Sprites) do
-		sendDebugMessage(sprite.name)
-		sendDebugMessage(booster_obj.key)
-		if sprite.name == booster_obj.key then
-			booster_obj.atlas = sprite.name
-		end
-	end
-
-	-- Now we replace the others
-	G.P_CENTERS[self.slug] = booster_obj
-	table.insert(G.P_CENTER_POOLS['Booster'], booster_obj)
-
-	-- Load it
-	for g_k, group in pairs(G.localization) do
-		if g_k == 'descriptions' then
-			for _, set in pairs(group) do
-				for _, center in pairs(set) do
-					center.text_parsed = {}
-					for _, line in ipairs(center.text) do
-						center.text_parsed[#center.text_parsed + 1] = loc_parse_string(line)
-					end
-					center.name_parsed = {}
-					for _, line in ipairs(type(center.name) == 'table' and center.name or {center.name}) do
-						center.name_parsed[#center.name_parsed + 1] = loc_parse_string(line)
-					end
-					if center.unlock then
-						center.unlock_parsed = {}
-						for _, line in ipairs(center.unlock) do
-							center.unlock_parsed[#center.unlock_parsed + 1] = loc_parse_string(line)
-						end
-					end
-				end
-			end
-		end
-	end
-
-	sendDebugMessage("The Booster named " .. self.name .. " with the slug " .. self.slug ..
-						 " have been registered at the id " .. id .. ".")
+    return card
 end
 
--- BOOSTER API
-
+--[[
 local can_use_consumeableref = Card.can_use_consumeable
 function Card:can_use_consumeable(any_state, skip_check)
 
@@ -716,74 +1456,6 @@ function Card:open()
   end
 end
 
-local blind_stay_flipped_ref = Blind.stay_flipped
-function Blind.stay_flipped(self, area, card)
-    if not self.disabled then
-        if area == G.hand then
-            if self.name == 'The Frost' then
-                if card:get_id() == 14 or card:get_id() == 3 or card:get_id() == 5 or card:get_id() == 7 or card:get_id() == 9 then
-                    return true
-                end
-            end
-            if self.name == 'The Heatwave' then
-                if card:get_id() == 2 or card:get_id() == 4 or card:get_id() == 6 or card:get_id() == 8 or card:get_id() == 10 then
-                    return true
-                end
-            end
-        end
-    end
-
-    return blind_stay_flipped_ref(self, area, card)
-end
-
-local blind_disable_ref = Blind.disable
-function Blind.disable(self)
-    self.disabled = true
-
-    if self.name == 'The Heatwave' or self.name == 'The Frost' then 
-        for i = 1, #G.hand.cards do
-            if G.hand.cards[i].facing == 'back' then
-                G.hand.cards[i]:flip()
-            end
-        end
-        for k, v in pairs(G.playing_cards) do
-            v.ability.wheel_flipped = nil
-        end
-    end
-
-    blind_disable_ref(self)
-end
-
-local blind_debuff_card_ref = Blind.debuff_card
-function Blind.debuff_card(self, card, from_blind)
-
-    if self.debuff and not self.disabled and card.area ~= G.jokers then
-        if self.name == 'The Prospector' then
-            if card.ability.name == 'Stone Card' or card.ability.name == 'Gold Card' or card.ability.name == 'Steel Card' or card.ability.name == 'Glass Card' then
-                card:set_debuff(true)
-                return
-            end
-        elseif self.name == 'The Gambler' then
-            if card.ability.name == 'Mult' or card.ability.name == 'Bonus' or card.ability.name == 'Wild Card' or card.ability.name == 'Lucky Card' then
-                card:set_debuff(true)
-                return
-            end
-        elseif self.name == 'The Pathway' then
-            if card:get_id() == 6 or card:get_id() == 7 or card:get_id() == 8 or card:get_id() == 9 or card:get_id() == 10 then
-                card:set_debuff(true)
-                return
-            end
-        elseif self.name == 'The Backside' then
-            if card:get_id() == 14 or card:get_id() == 2 or card:get_id() == 3 or card:get_id() == 4 or card:get_id() == 5 then
-                card:set_debuff(true)
-                return
-            end
-        end
-    end
-    
-    blind_debuff_card_ref(self, card, from_blind)
-end
-
 local cardsetedition = Card.set_edition
 function Card.set_edition(self, edition, immediate, silent)
     cardsetedition(self, edition, immediate, silent)
@@ -797,544 +1469,10 @@ function Card.set_edition(self, edition, immediate, silent)
     end
 end
 
-local create_card_def = create_card
-function create_card (_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
-    local card = create_card_def(_type, area, legendary, _rarity, skip_materialize, soulable, forced_key, key_append)
-    
-    if G.STATE == G.STATES.STANDARD_PACK and (card.ability.set == 'Default' or card.ability.set == 'Enhanced') and card.seal == nil then
-        if G.GAME.used_vouchers.v_stamper and not G.GAME.used_vouchers.v_seal_deal then
-            if pseudorandom('stamper_odds') > 0.25 then
-                local seal_type = pseudorandom_element({'Red','Purple','Gold','Blue'},pseudoseed('stamper'))
-                card:set_seal(seal_type)
-            end
-        elseif G.GAME.used_vouchers.v_seal_deal then
-            local seal_type = pseudorandom_element({'Red','Purple','Gold','Blue'},pseudoseed('seal_deal'))
-            card:set_seal(seal_type)
-        end
-    --elseif G.STATE == G.STATES.TAROT_PACK then
-    --    card:set_seal('Orange')
-    end
 
-    return card
-end
 
-local Backapply_to_runRef = Back.apply_to_run
-function Back.apply_to_run(self)
-    Backapply_to_runRef(self)
 
-    if self.effect.config.tarot_rate then
-        G.GAME.tarot_rate = self.effect.config.tarot_rate
-    end
 
-    if self.effect.config.planet_rate then
-        G.GAME.planet_rate = self.effect.config.planet_rate
-    end
-
-    if self.effect.config.edition_rate then
-        G.GAME.edition_rate = self.effect.config.edition_rate
-    end
-
-    if self.effect.config.playing_card_rate then
-        G.GAME.playing_card_rate = self.effect.config.playing_card_rate
-    end
-
-    if self.effect.config.auroramodifier then
-        G.GAME.starting_params.auroramodifier = self.effect.config.auroramodifier
-    end
-    
-    if self.effect.config.deckosmodifier then
-        G.E_MANAGER:add_event(Event({
-            func = function()
-                for k, v in pairs(G.playing_cards) do
-                    if v.base.suit == 'Clubs' then
-                        v:set_ability(G.P_CENTERS['m_busted'])
-                    end
-                end
-            return true
-            end
-        }))
-    end
-
-    if self.effect.config.lldmodifier then
-        delay(0.4)
-        G.E_MANAGER:add_event(Event({
-            func = function()
-                local seal_counter = 1
-                for k, v in pairs(G.playing_cards) do
-                    if v.base.value == 'Ace' or v.base.value == '10' or v.base.value == '6' then 
-                        v:change_suit('Spades')
-                    elseif v.base.value == 'King' or v.base.value == '9' or v.base.value == '5'  then
-                        v:change_suit('Hearts')
-                    elseif v.base.value == 'Queen' or v.base.value == '8' or v.base.value == '4'  then
-                        v:change_suit('Clubs')
-                    elseif v.base.value == 'Jack' or v.base.value == '7' or v.base.value == '3'  then
-                        v:change_suit('Diamonds')
-                    elseif v.base.value == '2' then
-                        v:set_ability(G.P_CENTERS['m_wild'])
-                        if seal_counter == 1 then v:set_seal('Red', true, true)
-                        elseif seal_counter == 2 then v:set_seal('Blue', true, true)
-                        elseif seal_counter == 3 then v:set_seal('Gold', true, true)
-                        else v:set_seal('Purple', true, true)
-                        end
-                        seal_counter = seal_counter + 1
-                    end
-
-                    --v:set_ability(G.P_CENTERS['m_steel'])
-                end
-            return true
-            end
-        }))
-    end
-end
-
-local lld_def = {
-    ["name"] = "Lemon-Lime Deck",
-    ["text"] = {
-        [1] = "Divides up the deck!",
-        [2] = "{C:red}-1{} discard.",
-        [3] = "The {C:attention}2's{} are extra tasty.",
-    },
-}
-
-local hallow_def = {
-    ["name"] = "Hallowed Deck",
-    ["text"] = {
-        [1] = "{C:planet}Planets{} and {C:purple}Tarots{}",
-        [2] = "no longer appear, while",
-        [3] = "{C:attention}Playing Cards{} now",
-        [4] = "appear in the shop."
-    }
-}
-
-local aurora_def = {
-    ["name"] = "Aurora Deck",
-    ["text"] = {
-        [1] = "Start with an {C:spectral,T:c_aura}Aura{} card.",
-        [2] = "{C:attention}Jokers{} and {C:attention}Playing Cards{}",
-        [3] = "are {C:attention}usually{} {C:dark_edition}Special.",
-        [4] = "{C:red}-1{} joker slot, {C:red}-1{} hand."
-    }
-}
-
-local sulfur_def = {
-    ["name"] = "Sulfur Deck",
-    ["text"] = {
-        [1] = "Start with a {C:tarot,T:c_death}Death{} card",
-        [2] = "and the {C:attention,T:v_overstock_norm}Overstock{} voucher.",
-        [3] = "{C:attention}Jokers{} appear less often.",
-    }
-}
-
-local deckos_def = {
-    ["name"] = "Deck OS",
-    ["text"] = {
-        [1] = "BOOTING...",
-        [2] = "{C:red}FAILED{} TO LOAD...",
-        [3] = "{C:spectral}ATTEMPTING{} TO FIX...",
-    }
-}
-
-local chipboost = 5
-local bonusboost = 10
-local multboost = 2
-local sylvie_moons = {
-    [1] = {
-        name = 'Europa',
-        text = {
-            "{C:attention}Upgrade{} all",
-            "{C:spades}Spade{} cards",
-            "in your deck",
-            "by {C:chips}+#1#{} Chips"
-        },
-        slug = "sylvie_europa",
-        effect = 'Upgrade Spades',
-        config = {
-            chips = chipboost
-        },
-        pos = {x=0, y=0},
-        loc_def = function(_c) return { _c.config.chips } end,
-        can_use = function(self) return true end,
-        use = function(self, area, copier)
-            local used_tarot = copier or self
-            for k, v in pairs(G.playing_cards) do
-                if v:is_suit('Spades') then
-                    v.ability.perma_bonus = v.ability.perma_bonus or 0
-                    v.ability.perma_bonus = v.ability.perma_bonus + chipboost
-                end
-            end
-            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                play_sound('timpani')
-                used_tarot:juice_up(0.3, 0.5)
-                attention_text({
-                    text = 'Spades Up!',
-                    scale = 1, 
-                    hold = 1.2,
-                    major = used_tarot,
-                    backdrop_colour = G.C.SO_1.Spades,
-                    align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
-                    offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
-                    silent = true
-                })
-                return true end }))
-            delay(2.6)
-            end,
-        set_badges = function(self, badges)
-			badges[1] = create_badge("Moon", get_type_colour(self.config.center or self.config, self), nil, 1.2)
-			return badges
-		end,
-    },
-    [2] = {
-        name = 'Io',
-        text = {
-            "{C:attention}Upgrade{} all",
-            "{C:clubs}Club{} cards",
-            "in your deck",
-            "by {C:chips}+#1#{} Chips"
-        },
-        slug = "sylvie_io",
-        effect = 'Upgrade Clubs',
-        config = {
-            chips = chipboost
-        },
-        pos = {x=1, y=0},
-        loc_def = function(_c) return { _c.config.chips } end,
-        can_use = function(self) return true end,
-        use = function(self, area, copier)
-            local used_tarot = copier or self
-            for k, v in pairs(G.playing_cards) do
-                if v:is_suit('Clubs') then
-                    v.ability.perma_bonus = v.ability.perma_bonus or 0
-                    v.ability.perma_bonus = v.ability.perma_bonus + chipboost
-                end
-            end
-            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                play_sound('timpani')
-                used_tarot:juice_up(0.3, 0.5)
-                attention_text({
-                    text = 'Clubs Up!',
-                    scale = 1, 
-                    hold = 1.2,
-                    major = used_tarot,
-                    backdrop_colour = G.C.SO_1.Clubs,
-                    align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
-                    offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
-                    silent = true
-                })
-                return true end }))
-            delay(2.6)
-            end,
-        set_badges = function(self, badges)
-			badges[1] = create_badge("Moon", get_type_colour(self.config.center or self.config, self), nil, 1.2)
-			return badges
-		end,
-    },
-    [3] = {
-        name = 'Callisto',
-        text = {
-            "{C:attention}Upgrade{} all",
-            "{C:hearts}Heart{} cards",
-            "in your deck",
-            "by {C:chips}+#1#{} Chips"
-        },
-        slug = "sylvie_callisto",
-        effect = 'Upgrade Hearts',
-        config = {
-            chips = chipboost
-        },
-        pos = {x=2, y=0},
-        loc_def = function(_c) return { _c.config.chips } end,
-        can_use = function(self) return true end,
-        use = function(self, area, copier)
-            local used_tarot = copier or self
-            for k, v in pairs(G.playing_cards) do
-                if v:is_suit('Hearts') then
-                    v.ability.perma_bonus = v.ability.perma_bonus or 0
-                    v.ability.perma_bonus = v.ability.perma_bonus + chipboost
-                end
-            end
-            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                play_sound('timpani')
-                used_tarot:juice_up(0.3, 0.5)
-                attention_text({
-                    text = 'Hearts Up!',
-                    scale = 1, 
-                    hold = 1.2,
-                    major = used_tarot,
-                    backdrop_colour = G.C.SO_1.Hearts,
-                    align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
-                    offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
-                    silent = true
-                })
-                return true end }))
-            delay(2.6)
-            end,
-        set_badges = function(self, badges)
-			badges[1] = create_badge("Moon", get_type_colour(self.config.center or self.config, self), nil, 1.2)
-			return badges
-		end,
-    },
-    [4] = {
-        name = 'Ganymede',
-        text = {
-            "{C:attention}Upgrade{} all",
-            "{C:diamonds}Diamond{} cards",
-            "in your deck",
-            "by {C:chips}+#1#{} Chips"
-        },
-        slug = "sylvie_ganymede",
-        effect = 'Upgrade Diamonds',
-        config = {
-            chips = chipboost
-        },
-        pos = {x=3, y=0},
-        loc_def = function(_c) return { _c.config.chips } end,
-        can_use = function(self) return true end,
-        use = function(self, area, copier)
-            local used_tarot = copier or self
-            for k, v in pairs(G.playing_cards) do
-                if v:is_suit('Diamonds') then
-                    v.ability.perma_bonus = v.ability.perma_bonus or 0
-                    v.ability.perma_bonus = v.ability.perma_bonus + chipboost
-                end
-            end
-            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                play_sound('timpani')
-                used_tarot:juice_up(0.3, 0.5)
-                attention_text({
-                    text = 'Diamonds Up!',
-                    scale = 1, 
-                    hold = 1.2,
-                    major = used_tarot,
-                    backdrop_colour = G.C.SO_1.Diamonds,
-                    align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
-                    offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
-                    silent = true
-                })
-                return true end }))
-            delay(2.6)
-            end,
-        set_badges = function(self, badges)
-			badges[1] = create_badge("Moon", get_type_colour(self.config.center or self.config, self), nil, 1.2)
-			return badges
-		end,
-    },
-    [5] = {
-        name = 'Charon',
-        text = {
-            "{C:attention}Upgrade{} {C:chips}Bonus Cards{}",
-            "by {C:chips}+#1#{} chips",
-            "Affects {C:chips}Current{}",
-            "and {C:dark_edition}Future{} cards",
-        },
-        slug = "sylvie_charon",
-        effect = 'Upgrade Bonus Cards',
-        config = {
-            chips = bonusboost
-        },
-        pos = {x=0, y=1},
-        loc_def = function(_c, info_queue)
-			info_queue[#info_queue+1] = G.P_CENTERS.m_bonus
-
-			return { _c.config.chips }
-		end,
-        can_use = function(self) return true end,
-        use = function(self, area, copier)
-            local used_tarot = copier or self
-            G.P_CENTER_POOLS.Enhanced[1].config.bonus = G.P_CENTER_POOLS.Enhanced[1].config.bonus + bonusboost
-            for k, v in pairs(G.playing_cards) do
-                if v.config.center == G.P_CENTERS.m_bonus then
-                    v:set_ability(G.P_CENTERS.m_bonus)
-                end
-            end
-
-            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                play_sound('timpani')
-                used_tarot:juice_up(0.3, 0.5)
-                attention_text({
-                    text = 'Bonus Up!',
-                    scale = 1, 
-                    hold = 1.2,
-                    major = used_tarot,
-                    backdrop_colour = G.C.CHIPS,
-                    align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
-                    offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
-                    silent = true
-                })
-                return true end }))
-            delay(2.6)
-            end,
-        set_badges = function(self, badges)
-			badges[1] = create_badge("Moon", get_type_colour(self.config.center or self.config, self), nil, 1.2)
-			return badges
-		end,
-    },
-
-    [6] = {
-        name = 'Hydra',
-        text = {
-            "{C:attention}Upgrade{} {C:mult}Mult Cards{}",
-            "by {C:mult}+#1#{} mult",
-            "Affects {C:mult}Current{}",
-            "and {C:dark_edition}Future{} cards",
-        },
-        slug = "sylvie_hydra",
-        effect = 'Upgrade Mult Cards',
-        config = {
-            mult = multboost
-        },
-        pos = {x=1, y=1},
-        loc_def = function(_c, info_queue)
-			info_queue[#info_queue+1] = G.P_CENTERS.m_mult
-
-			return { _c.config.mult }
-		end,
-        can_use = function(self) return true end,
-        use = function(self, area, copier)
-            local used_tarot = copier or self
-            G.P_CENTER_POOLS.Enhanced[2].config.mult = G.P_CENTER_POOLS.Enhanced[2].config.mult + multboost
-            for k, v in pairs(G.playing_cards) do
-                if v.config.center == G.P_CENTERS.m_mult then
-                    v:set_ability(G.P_CENTERS.m_mult)
-                end
-            end
-
-            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                play_sound('timpani')
-                used_tarot:juice_up(0.3, 0.5)
-                attention_text({
-                    text = 'Mult Up!',
-                    scale = 1, 
-                    hold = 1.2,
-                    major = used_tarot,
-                    backdrop_colour = G.C.MULT,
-                    align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
-                    offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
-                    silent = true
-                })
-                return true end }))
-            delay(2.6)
-            end,
-        set_badges = function(self, badges)
-			badges[1] = create_badge("Moon", get_type_colour(self.config.center or self.config, self), nil, 1.2)
-			return badges
-		end,
-    },
-    [7] = {
-        name = 'Titan',
-        text = {
-            "{C:attention}Upgrade{} {C:chips}Stone Cards{}",
-            "by {C:chips}+#1#{} chips",
-            "Affects {C:chips}Current{}",
-            "and {C:dark_edition}Future{} cards",
-        },
-        slug = "sylvie_titan",
-        effect = 'Upgrade Stone Cards',
-        config = {
-            chips = 10
-        },
-        pos = {x=0, y=2},
-        loc_def = function(_c, info_queue)
-			info_queue[#info_queue+1] = G.P_CENTERS.m_stone
-
-			return { _c.config.chips }
-		end,
-        can_use = function(self) return true end,
-        use = function(self, area, copier)
-            local used_tarot = copier or self
-            G.P_CENTER_POOLS.Enhanced[6].config.bonus = G.P_CENTER_POOLS.Enhanced[6].config.bonus + 10
-            for k, v in pairs(G.playing_cards) do
-                if v.config.center == G.P_CENTERS.m_stone then
-                    v:set_ability(G.P_CENTERS.m_stone)
-                end
-            end
-
-            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                play_sound('timpani')
-                used_tarot:juice_up(0.3, 0.5)
-                attention_text({
-                    text = 'Stone Up!',
-                    scale = 1, 
-                    hold = 1.2,
-                    major = used_tarot,
-                    backdrop_colour = G.C.CHIPS,
-                    align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
-                    offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
-                    silent = true
-                })
-                return true end }))
-            delay(2.6)
-            end,
-        set_badges = function(self, badges)
-			badges[1] = create_badge("Moon", get_type_colour(self.config.center or self.config, self), nil, 1.2)
-			return badges
-		end,
-    },
-    [8] = {
-        name = 'Euceladus',
-        text = {
-            "{C:attention}Upgrade{} {C:money}Gold Cards{}",
-            "by {C:money}+1{} dollars",
-            "Affects {C:money}Current{}",
-            "and {C:dark_edition}Future{} cards",
-        },
-        slug = "sylvie_euceladus",
-        effect = 'Upgrade Gold Cards',
-        config = {
-            gold = 1
-        },
-        pos = {x=1, y=2},
-        loc_def = function(_c, info_queue)
-			info_queue[#info_queue+1] = G.P_CENTERS.m_gold
-
-			return { _c.config.gold }
-		end,
-        can_use = function(self) return true end,
-        use = function(self, area, copier)
-            local used_tarot = copier or self
-            G.P_CENTER_POOLS.Enhanced[7].config.h_dollars = G.P_CENTER_POOLS.Enhanced[7].config.h_dollars + 1
-            for k, v in pairs(G.playing_cards) do
-                if v.config.center == G.P_CENTERS.m_gold then
-                    v:set_ability(G.P_CENTERS.m_gold)
-                end
-            end
-
-            G.E_MANAGER:add_event(Event({trigger = 'after', delay = 0.4, func = function()
-                play_sound('timpani')
-                used_tarot:juice_up(0.3, 0.5)
-                attention_text({
-                    text = 'Gold Up!',
-                    scale = 1, 
-                    hold = 1.2,
-                    major = used_tarot,
-                    backdrop_colour = G.C.MONEY,
-                    align = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and 'tm' or 'cm',
-                    offset = {x = 0, y = (G.STATE == G.STATES.TAROT_PACK or G.STATE == G.STATES.SPECTRAL_PACK) and -0.2 or 0},
-                    silent = true
-                })
-                return true end }))
-            delay(2.6)
-            end,
-        set_badges = function(self, badges)
-			badges[1] = create_badge("Moon", get_type_colour(self.config.center or self.config, self), nil, 1.2)
-			return badges
-		end,
-    },
-
-}
-
-local Game_start_run_ref = Game.start_run;
-function Game:start_run(args)
-	local ret = Game_start_run_ref(self, args)
-
-    -- RESET
-    G.P_CENTER_POOLS.Enhanced[1].config.bonus = 30
-    G.P_CENTER_POOLS.Enhanced[2].config.mult = 4
-
-    G.P_CENTER_POOLS.Enhanced[6].config.bonus = 50
-    G.P_CENTER_POOLS.Enhanced[7].config.h_dollars = 3
-
-	return ret
-end
 
 function push_pool(table,pack)
     for k,v in pairs(table) do
@@ -1342,7 +1480,6 @@ function push_pool(table,pack)
     end
 end
 
-function SMODS.INIT.SylvieSilly()
 
 local fortune_pool = pack_pools['Fortune']['TarotPlanet']
 local fortune_pool_spectral = pack_pools['Fortune']['Spectral']
@@ -1351,7 +1488,7 @@ local fortune_pool_joker = pack_pools['Fortune']['Joker']
 local bonus_pool = pack_pools['Bonus']['TarotPlanet']
 local bonus_pool_spectral = pack_pools['Bonus']['Spectral']
 
-local fortune_jokers,suits_jokers, = nil,nil
+local fortune_jokers,suits_jokers = nil,nil
 
 if not (SMODS.INIT.CodexArcanum == nil) then
     fortune_pool[#fortune_pool+1] = 'c_alchemy_sulfur'
@@ -1363,8 +1500,6 @@ if not (SMODS.INIT.CodexArcanum == nil) then
 end
 
 if (SMODS.INIT.MoreFluff ~= nil) then
-    
-
 end
 
 if (TheAutumnCircus ~= nil) then
@@ -1388,44 +1523,41 @@ if (TheAutumnCircus ~= nil) then
 end
 
 
-local mod = SMODS.findModByID("SylvieSilly")
-
-SMODS.Sprite:new("sylvie_backs", mod.path, "sylvie_backs.png", 71, 95, "asset_atli"):register()
-SMODS.Sprite:new("sylvie_moons", mod.path, "sylvie_moons.png", 71, 95, "asset_atli"):register()
-SMODS.Sprite:new("sylvie_vouchers", mod.path, 'sylvie_vouchers.png', 71, 95, 'asset_atli'):register()
-SMODS.Sprite:new("sylvie_blinds", mod.path, 'sylvie_blinds.png', 34, 34, 'animation_atli', 21):register()
-SMODS.Sprite:new('sylvie_spectrals', mod.path, 'sylvie_spectrals.png', 71, 95, 'asset_atli'):register()
-SMODS.Sprite:new('sylvie_boosters', mod.path, 'sylvie_boosters.png', 71, 95, 'asset_atli'):register()
-
-SMODS.Blind:new('The Prospector', 'prospector', {name = 'The Prospector', text = {'All Stone, Steel, Gold, and', 'Glass cards are debuffed'}}, 5, 2, {}, {}, {x=0, y=0}, {min = 2, max = 10}, HEX('e57f8d'), false, "sylvie_blinds"):register()
-SMODS.Blind:new('The Gambler', 'gambler', {name = 'The Gambler', text = {'All Wild, Lucky, Mult, and', 'Bonus cards are debuffed'}}, 5, 2, {}, {}, {x=0, y=1}, {min = 2, max = 10}, HEX('62679a'), false, "sylvie_blinds"):register()
-SMODS.Blind:new('The Pathway', 'pathway', {name = 'The Pathway', text = {'All 6, 7, 8, 9, and', '10 cards are debuffed'}}, 5, 2, {}, {}, {x=0, y=2}, {min = 1, max = 10}, HEX('9a8a43'), false, 'sylvie_blinds'):register()
-SMODS.Blind:new('The Backside', 'backside', {name = 'The Backside', text = {'All Ace, 2, 3, 4, and', '5 cards are debuffed'}}, 5, 2, {}, {}, {x=0, y=3}, {min = 1, max = 10}, HEX('88619a'), true, 'sylvie_blinds'):register()
-SMODS.Blind:new('The Heatwave', 'heatwave', {name = 'The Heatwave', text = {'All even cards are', 'drawn face down'}}, 5, 2, {}, {}, {x=0, y=4}, {min = 2, max = 10}, HEX('b72041'), true, 'sylvie_blinds'):register()
-SMODS.Blind:new('The Frost', 'frost', {name = 'The Frost', text = {'All odd cards are', 'drawn face down'}}, 5, 2, {}, {}, {x=0, y=5}, {min = 2, max = 10}, HEX('5090b7'), true, 'sylvie_blinds'):register()
-
-SMODS.Deck:new("Lemon-Lime Deck", "ss_lemonlime", {lldmodifier = true, discards = -1, atlas = 'sylvie_backs'}, {x = 0, y = 5}, lld_def):register()
-SMODS.Deck:new("Aurora Deck", "ss_aurora", {vouchers = {'v_hone', 'v_glow_up'},auroramodifier = true, consumables = {'c_aura'}, joker_slot = -1, hands = -1, atlas = 'sylvie_backs'}, {x = 2, y = 5}, aurora_def):register()
-SMODS.Deck:new("Sulfur Deck", "ss_sulfur", {consumables = {'c_death'}, joker_rate = 4, voucher = 'v_overstock_norm', atlas = 'sylvie_backs'}, {x = 3, y = 5}, sulfur_def):register()
-SMODS.Deck:new("Hallowed Deck", "ss_hallowed", {tarot_rate = 0, planet_rate = 0, playing_card_rate = 10, voucher = 'v_magic_trick', atlas = 'sylvie_backs'},{x = 1, y = 5}, hallow_def):register()
---SMODS.Deck:new("Deck OS", "ss_deckos", {deckosmodifier = true, atlas = 'sylvie_backs'}, {x = 4, y = 5}, deckos_def)
-
-SMODS.Booster:new("Suits Pack", "suit_normal_1", {extra = 3, choose = 1}, { x = 0, y = 0 }, 5, true, 1, "Arcana", "sylvie_boosters"):register()
-SMODS.Booster:new("Suits Pack", "suit_normal_2", {extra = 3, choose = 1}, { x = 1, y = 0 }, 5, true, 1, "Arcana", "sylvie_boosters"):register()
-SMODS.Booster:new("Jumbo Suits Pack", "suit_jumbo", {extra = 5, choose = 1}, { x = 2, y = 0 }, 7, true, 0.75, "Arcana", "sylvie_boosters"):register()
-SMODS.Booster:new("Mega Suits Pack", "suit_mega", {extra = 5, choose = 2}, { x = 3, y = 0 }, 9, true, 0.25, "Arcana", "sylvie_boosters"):register()
-SMODS.Booster:new("Bonus Pack", "bonus_normal", {extra = 3, choose = 1}, { x = 0, y = 1 }, 5, true, 1, "Arcana", "sylvie_boosters"):register()
-SMODS.Booster:new("Jumbo Bonus Pack", "bonus_jumbo", {extra = 5, choose = 1}, { x = 1, y = 1 }, 7, true, 0.75, "Arcana", "sylvie_boosters"):register()
-SMODS.Booster:new("Fortune Pack", "fortune_normal", {extra = 3, choose = 1}, { x = 2, y = 1 }, 5, true, 1, "Arcana", "sylvie_boosters"):register()
-SMODS.Booster:new("Jumbo Fortune Pack", "fortune_jumbo", {extra = 5, choose = 1}, { x = 3, y = 1 }, 7, true, 0.75, "Arcana", "sylvie_boosters"):register()
-
-G.localization.descriptions["Other"]["p_suits_normal"] = {
-    name = "Suits Pack",
-    text = {
+SMODS.Booster {
+    key = 'suit_normal_1',
+    atlas = 'sylvie_boosters',
+    group_key = 'k_suits_pack',
+    loc_txt = {
+        name = "Suits Pack",
+        text = {
         "Choose {C:attention}#1#{} of up to",
         "{C:attention}#2# Suit-Themed{} cards.",
-    }
-}
+        }
+    },
+    weight = 1,
+    name = "Suits Pack",
+    pos = {x = 0, y = 0},
+    config = {extra = 3, choose = 1, name = "Suits Pack"},
+    create_card = function(self, card)
+        create_card("Suits", G.pack_cards, nil, nil, true, true, nil, "ss_suits")
+    end,
+    loc_vars = function(self, info_queue, card)
+        return { vars = { card.config.center.config.choose, card.ability.extra } }
+    end,
+ }
+
+
+
+--SMODS.Booster:new("Suits Pack", "suit_normal_1", {extra = 3, choose = 1}, { x = 0, y = 0 }, 5, true, 1, "Arcana", "sylvie_boosters"):register()
+--SMODS.Booster:new("Suits Pack", "suit_normal_2", {extra = 3, choose = 1}, { x = 1, y = 0 }, 5, true, 1, "Arcana", "sylvie_boosters"):register()
+--SMODS.Booster:new("Jumbo Suits Pack", "suit_jumbo", {extra = 5, choose = 1}, { x = 2, y = 0 }, 7, true, 0.75, "Arcana", "sylvie_boosters"):register()
+--SMODS.Booster:new("Mega Suits Pack", "suit_mega", {extra = 5, choose = 2}, { x = 3, y = 0 }, 9, true, 0.25, "Arcana", "sylvie_boosters"):register()
+--SMODS.Booster:new("Bonus Pack", "bonus_normal", {extra = 3, choose = 1}, { x = 0, y = 1 }, 5, true, 1, "Arcana", "sylvie_boosters"):register()
+--SMODS.Booster:new("Jumbo Bonus Pack", "bonus_jumbo", {extra = 5, choose = 1}, { x = 1, y = 1 }, 7, true, 0.75, "Arcana", "sylvie_boosters"):register()
+--SMODS.Booster:new("Fortune Pack", "fortune_normal", {extra = 3, choose = 1}, { x = 2, y = 1 }, 5, true, 1, "Arcana", "sylvie_boosters"):register()
+--SMODS.Booster:new("Jumbo Fortune Pack", "fortune_jumbo", {extra = 5, choose = 1}, { x = 3, y = 1 }, 7, true, 0.75, "Arcana", "sylvie_boosters"):register()
+
+
 G.localization.descriptions["Other"]["p_suits_jumbo"] = {
     name = "Jumbo Suits Pack",
     text = {
@@ -1469,49 +1601,10 @@ G.localization.descriptions["Other"]["p_fortune_jumbo"] = {
     }
 }
 
-local stamper_def = {
-    name = 'Stamper',
-    text = {
-        'Increase chance to find',
-        '{C:attention}Playing cards{} with {C:attention}Seals',
-        'in {C:attention}Standard Packs',
-    },
-}
-local sealdeal_def = {
-    name = 'Seal the Deal',
-    text = {
-        '{C:attention}Playing cards{} from',
-        '{C:attention}Standard Packs{} always',
-        'have {C:attention}Seals',
-    },
-}
+]]
 
-SMODS.Voucher:new("Stamper", 'stamper', {}, {x=0,y=0}, stamper_def, 10, true, true, true, nil, 'sylvie_vouchers'):register()
-SMODS.Voucher:new("SealDeal", 'seal_deal', {}, {x=1,y=0}, sealdeal_def, 10, true, false, true, {'v_stamper'}, 'sylvie_vouchers'):register()
 
-for key,info in ipairs(sylvie_moons) do
-    local v = sylvie_moons[key]
-    SMODS.Planet:new(v.name, v.slug, v.config, v.pos, {name = v.name, text = v.text }, 3, 1.0, v.effect, 1, true, true, "sylvie_moons"):register()
-    SMODS.Planets["c_"..v.slug].loc_def = v.loc_def
-    SMODS.Planets["c_"..v.slug].can_use = v.can_use
-    SMODS.Planets["c_"..v.slug].use = v.use
-    SMODS.Planets["c_"..v.slug].set_badges = v.set_badges
-end
 
-SMODS.Spectral:new('Bloom', 'bloom', {}, {x = 0, y = 0}, {name = 'Bloom',text = {'Create an {C:money}Speed{},','{C:money}Investment{}, or','{C:money}Economy Tag'}}, 4, nil, nil, 'sylvie_spectrals'):register()
 
-function SMODS.Spectrals.c_bloom.can_use(card)
-    return true
-end
-
-function SMODS.Spectrals.c_bloom.use(card, area, copier)
-    G.E_MANAGER:add_event(Event({trigger = 'after',delay = 0.1,func = function()
-        local bloom_tag_name = pseudorandom_element({'tag_economy', 'tag_skip', 'tag_investment'})
-        local bloom_tag = Tag(bloom_tag_name, nil, G.GAME.blind)
-        add_tag(bloom_tag)
-        return true end }))
-end
-
-end
 ----------------------------------------------
 ------------MOD CODE END----------------------
