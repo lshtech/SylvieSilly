@@ -1119,6 +1119,7 @@ SMODS.Booster {
     weight = 1,
     name = "Suits Pack",
     pos = {x = 0, y = 0},
+    draw_hand = true,
     config = {draw_hand = true, extra = 3, choose = 1, name = "Suits Pack"},
     create_card = function(self, card)
         if pseudorandom('fortune-pack-tarot') < 0.75 then
@@ -1149,6 +1150,7 @@ SMODS.Booster {
     cost = 5,
     name = "Suits Pack",
     pos = {x = 1, y = 0},
+    draw_hand = true,
     config = {draw_hand = true, extra = 3, choose = 1, name = "Suits Pack"},
     create_card = function(self, card)
         if pseudorandom('fortune-pack-tarot') < 0.75 then
@@ -1179,6 +1181,7 @@ SMODS.Booster {
     cost = 7,
     name = "Jumbo Suits Pack",
     pos = {x = 2, y = 0},
+    draw_hand = true,
     config = {draw_hand = true, extra = 5, choose = 1, name = "Jumbo Suits Pack"},
     create_card = function(self, card)
         if pseudorandom('fortune-pack-tarot') < 0.75 then
@@ -1209,6 +1212,7 @@ SMODS.Booster {
     cost = 9,
     name = "Mega Suits Pack",
     pos = {x = 3, y = 0},
+    draw_hand = true,
     config = {draw_hand = true, extra = 5, choose = 2, name = "Mega Suits Pack"},
     create_card = function(self, card)
         if pseudorandom('fortune-pack-tarot') < 0.75 then
@@ -1239,6 +1243,7 @@ SMODS.Booster {
     weight = 1,
     name = "Bonus Pack",
     pos = {x = 0, y = 1},
+    draw_hand = true,
     config = {draw_hand = true, extra = 3, choose = 1, name = "Bonus Pack"},
     create_card = function(self, card)
         if pseudorandom('fortune-pack-tarot') < 0.75 then
@@ -1269,6 +1274,7 @@ SMODS.Booster {
     weight = 0.75,
     name = "Jumbo Bonus Pack",
     pos = {x = 1, y = 1},
+    draw_hand = true,
     config = {draw_hand = true, extra = 5, choose = 1, name = "Jumbo Bonus Pack"},
     create_card = function(self, card)
         if pseudorandom('fortune-pack-tarot') < 0.75 then
@@ -1299,6 +1305,7 @@ SMODS.Booster {
     weight = 1,
     name = "Fortune Pack",
     pos = {x = 2, y = 1},
+    draw_hand = true,
     config = {draw_hand = true, extra = 3, choose = 1, name = "Fortune Pack"},
     create_card = function(self, card)
         if pseudorandom('fortune-pack-tarot') < 0.75 then
@@ -1329,6 +1336,7 @@ SMODS.Booster {
     weight = 0.75,
     name = "Jumbo Fortune Pack",
     pos = {x = 3, y = 1},
+    draw_hand = true,
     config = {draw_hand = true, extra = 3, choose = 1, name = "Jumbo Fortune Pack"},
     create_card = function(self, card)
         if pseudorandom('fortune-pack-tarot') < 0.75 then
