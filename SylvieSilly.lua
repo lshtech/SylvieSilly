@@ -661,7 +661,7 @@ SMODS.Voucher {
     redeem = function(self)
     end,
     atlas = "sylvie_vouchers",
-    requires={MOD_PREFIX_V..'stamper'}
+    requires={'v_sylvie_stamper'}
 }
 
 SMODS.Consumable {
