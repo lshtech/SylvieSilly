@@ -67,6 +67,7 @@ local bonus = {
         'c_alchemy_cobalt',
         'c_alchemy_bismuth',
     },
+    ['Joker'] = {},
     ['Spectral'] = {
         'c_familiar',
         'c_grim',
@@ -1353,10 +1354,9 @@ SMODS.Booster {
     end,
 }
 
-local Game_start_run_ref = Game.start_run;
-function Game:start_run(args)
-	local ret = Game_start_run_ref(self, args)
-
+local splash_screenRef = Game.splash_screen
+function Game:splash_screen()
+	local ret = splash_screenRef(self)
     -- RESET
     G.P_CENTERS["m_bonus"].config.bonus = 30
     G.P_CENTERS["m_mult"].config.mult = 4
