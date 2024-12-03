@@ -595,7 +595,7 @@ SMODS.Back {
         G.GAME.playing_card_rate = 10
     end
 }
-SMODS.Back {
+--[[SMODS.Back {
     key = 'ss_deckos',
     loc_txt = {
         name = "Deck OS",
@@ -621,7 +621,7 @@ SMODS.Back {
             end
         }))
     end
-}
+}]]
 
 SMODS.Voucher {
     key = 'stamper',
